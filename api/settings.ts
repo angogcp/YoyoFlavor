@@ -8,7 +8,7 @@ export default async function handler(req: Request) {
   }
   if (req.method === 'PUT') {
     const key = req.headers.get('x-admin-key')
-    const expected = process.env.ADMIN_KEY
+    const expected = (globalThis as any)?.process?.env?.ADMIN_KEY as string | undefined
     if (!key || (expected && key !== expected)) return new Response('Unauthorized', { status: 401 })
     const body = await req.json()
     await db.setSettings(body)

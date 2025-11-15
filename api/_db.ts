@@ -1,8 +1,8 @@
-import { list, put } from '@vercel/blob'
-
 async function readJson<T>(name: string, seed: T): Promise<{ data: T; url?: string }> {
   const prefix = `data/${name}.json`
-  const l = await list({ prefix, token: process.env.BLOB_READ_WRITE_TOKEN })
+  const token = (globalThis as any)?.process?.env?.BLOB_READ_WRITE_TOKEN as string | undefined
+  const { list } = await import('@vercel/blob')
+  const l = await list({ prefix, token })
   const item = l.blobs.find(b => b.pathname === prefix)
   if (!item) return { data: seed }
   const res = await fetch(item.url)
@@ -12,37 +12,39 @@ async function readJson<T>(name: string, seed: T): Promise<{ data: T; url?: stri
 
 async function writeJson<T>(name: string, value: T): Promise<void> {
   const body = JSON.stringify(value)
-  await put(`data/${name}.json`, body, { contentType: 'application/json', access: 'public', token: process.env.BLOB_READ_WRITE_TOKEN })
+  const token = (globalThis as any)?.process?.env?.BLOB_READ_WRITE_TOKEN as string | undefined
+  const { put } = await import('@vercel/blob')
+  await put(`data/${name}.json`, body, { contentType: 'application/json', access: 'public', token })
 }
 
 export const db = {
   async getPosts() {
-    const seed = (await import('../src/data/posts')).posts
-    return readJson('posts', seed)
+    const seed = (await import('../src/data/posts')).posts as any[]
+    return readJson<any[]>('posts', seed)
   },
   async setPosts(value: any) {
     await writeJson('posts', value)
   },
   async getReviews() {
-    return readJson('reviews', [])
+    return readJson<any[]>('reviews', [])
   },
   async setReviews(value: any) {
     await writeJson('reviews', value)
   },
   async getLikes() {
-    return readJson('likes', {})
+    return readJson<Record<string, number>>('likes', {})
   },
   async setLikes(value: any) {
     await writeJson('likes', value)
   },
   async getContacts() {
-    return readJson('contacts', [])
+    return readJson<any[]>('contacts', [])
   },
   async setContacts(value: any) {
     await writeJson('contacts', value)
   },
   async getSettings() {
-    return readJson('settings', { logoUrl: '/images/yoyo logo.png', bannerUrl: '/images/yoyo-new-.png' })
+    return readJson<{ logoUrl: string; bannerUrl: string }>('settings', { logoUrl: '/images/yoyo logo.png', bannerUrl: '/images/yoyo-new-.png' })
   },
   async setSettings(value: any) {
     await writeJson('settings', value)

@@ -23,7 +23,7 @@ export default async function handler(req: Request) {
   }
   if (req.method === 'PATCH') {
     const key = req.headers.get('x-admin-key')
-    const expected = process.env.ADMIN_KEY
+    const expected = (globalThis as any)?.process?.env?.ADMIN_KEY as string | undefined
     if (!key || (expected && key !== expected)) return new Response('Unauthorized', { status: 401 })
     const body = await req.json() as { id: string; status: string }
     const { data } = await db.getReviews()
@@ -36,7 +36,7 @@ export default async function handler(req: Request) {
   }
   if (req.method === 'DELETE') {
     const key = req.headers.get('x-admin-key')
-    const expected = process.env.ADMIN_KEY
+    const expected = (globalThis as any)?.process?.env?.ADMIN_KEY as string | undefined
     if (!key || (expected && key !== expected)) return new Response('Unauthorized', { status: 401 })
     const url = new URL(req.url)
     const id = url.searchParams.get('id') || ''
