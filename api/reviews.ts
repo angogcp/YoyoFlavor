@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' }
+export const config = { runtime: 'nodejs' }
 import { db } from './_db'
 
 function id() { return Math.random().toString(36).slice(2, 10) }

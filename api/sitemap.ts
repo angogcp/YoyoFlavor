@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' }
+export const config = { runtime: 'nodejs' }
 import { db } from './_db'
 
 function xmlEscape(s: string) {
