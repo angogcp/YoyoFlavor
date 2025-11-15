@@ -1,0 +1,94 @@
+import { Box, Container, Stack, Typography, Button, Paper, Chip, Grid, Divider } from '@mui/material'
+import PhoneIcon from '@mui/icons-material/Phone'
+import WhatsAppIcon from '@mui/icons-material/WhatsApp'
+import PlaceIcon from '@mui/icons-material/Place'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { t } from '../i18n'
+import SEO from '../components/SEO'
+import Page from '../components/Page'
+import { useQuery } from '@tanstack/react-query'
+import { api } from '../lib/api'
+
+function useLocale() {
+  const { pathname } = useLocation()
+  const seg = pathname.split('/')[1]
+  return seg === 'zh' ? 'zh' : 'en'
+}
+
+export default function Home() {
+  const locale = useLocale()
+  const nav = useNavigate()
+  const { scrollY } = useScroll()
+  const y = useTransform(scrollY, [0, 300], [0, -30])
+  const { data: settings } = useQuery({ queryKey: ['settings'], queryFn: () => api.getSettings() })
+  const schedule = [
+    { d: 'Mon', open: '11:00', close: '22:00' },
+    { d: 'Tue', open: '11:00', close: '22:00' },
+    { d: 'Wed', open: '11:00', close: '22:00' },
+    { d: 'Thu', open: '11:00', close: '22:00' },
+    { d: 'Fri', open: '11:00', close: '22:00' },
+    { d: 'Sat', open: '10:00', close: '23:00' },
+    { d: 'Sun', open: '10:00', close: '23:00' }
+  ]
+  const now = new Date()
+  const todayIdx = now.getDay() === 0 ? 6 : now.getDay() - 1
+  function toMinutes(t: string) { const [hh, mm] = t.split(':').map(Number); return hh * 60 + mm }
+  const mins = now.getHours() * 60 + now.getMinutes()
+  const todays = schedule[todayIdx]
+  const isOpen = mins >= toMinutes(todays.open) && mins <= toMinutes(todays.close)
+  return (
+    <Page>
+      <SEO title="YoYo Flavor – Home" description="Discover your flavor with YoYo restaurant menu, gallery, reviews, and quiz." locale={locale as any} ogImage={settings?.bannerUrl || '/images/yoyo-new-.png'} />
+      <Box sx={{ position: 'relative', height: 420, overflow: 'hidden' }}>
+        <motion.img src={settings?.bannerUrl || '/images/yoyo-new-.png'} alt="Banner" style={{ y, width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.7)' }} />
+        <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0) 100%)' }} />
+        <Container sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center' }}>
+          <Stack spacing={2} component={motion.div} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <Typography variant="h3" color="white">{t(locale as any, 'home_tagline')}</Typography>
+            <Stack direction="row" spacing={2}>
+              <Button variant="contained" color="primary" onClick={() => nav(`/${locale}/menu`)}>Explore Menu</Button>
+              <Button variant="outlined" color="secondary" onClick={() => nav(`/${locale}/quiz`)}>Flavor Quiz</Button>
+            </Stack>
+          </Stack>
+        </Container>
+      </Box>
+      <Container sx={{ py: 6 }}>
+        <Typography variant="h5" sx={{ mb: 2 }}>{t(locale as any, 'hours')}</Typography>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={7}>
+            <Paper sx={{ p: 3, borderRadius: 3 }} component={motion.div} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+              <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+                <Box component="img" src="/images/yoyo hour.png" alt="Hours" sx={{ height: 52, borderRadius: 1 }} />
+                <Chip label={isOpen ? 'Open now' : 'Closed'} color={isOpen ? 'success' : 'default'} size="small" />
+              </Stack>
+              <Divider sx={{ mb: 2 }} />
+              <Grid container spacing={1}>
+                {schedule.map((s, i) => (
+                  <Grid item xs={12} sm={6} key={s.d}>
+                    <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ p: 1.5, borderRadius: 2, border: '1px solid', borderColor: 'divider', bgcolor: i === todayIdx ? 'action.selected' : 'background.paper' }}>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Typography variant="body2" sx={{ fontWeight: i === todayIdx ? 700 : 500 }}>{s.d}</Typography>
+                        {i === todayIdx && <Chip label="Today" size="small" color="primary" variant="outlined" />}
+                      </Stack>
+                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{s.open}–{s.close}</Typography>
+                    </Stack>
+                  </Grid>
+                ))}
+              </Grid>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={5}>
+            <Paper sx={{ p: 3, borderRadius: 3 }} component={motion.div} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+              <Stack spacing={2}>
+                <Button startIcon={<PhoneIcon />} variant="contained" href="tel:+0000000000">Call</Button>
+                <Button startIcon={<WhatsAppIcon />} variant="outlined" href="https://wa.me/0000000000" target="_blank">WhatsApp</Button>
+                <Button startIcon={<PlaceIcon />} variant="text" href="https://maps.google.com" target="_blank">Find us</Button>
+              </Stack>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Container>
+    </Page>
+  )
+}
