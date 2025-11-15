@@ -5,11 +5,10 @@ export default function Footer() {
     <Box component="footer" sx={{ py: 5, borderTop: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
       <Container>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="body2" color="text.secondary">© YoYo Flavor</Typography>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Box component="img" src="/images/yoyo logo.png" alt="YoYo" sx={{ height: 24 }} />
-            <Typography variant="body2" color="text.secondary">Visit us</Typography>
-          </Stack>
+          <Typography variant="body2" color="text.secondary">Created by Ango 2025. All right reserved.</Typography>
+          <Box component="a" href="https://n-blog.angoango.dpdns.org/" target="_blank" rel="noopener noreferrer" sx={{ textDecoration: 'none' }}>
+            <Typography variant="body2" color="primary">https://n-blog.angoango.dpdns.org/</Typography>
+          </Box>
         </Stack>
       </Container>
     </Box>

@@ -22,6 +22,30 @@ export default function Home() {
   const { scrollY } = useScroll()
   const y = useTransform(scrollY, [0, 300], [0, -30])
   const { data: settings } = useQuery({ queryKey: ['settings'], queryFn: () => api.getSettings() })
+  const address = settings?.address || '324 Jalan Bercham, Taman Medan Bercham, 31400 Ipoh, Perak, Malaysia'
+  const phone = '0125200357'
+  const waLink = `https://wa.me/${phone.replace(/^0/, '60')}`
+  function mapsLink() {
+    if (typeof settings?.lat === 'number' && typeof settings?.lng === 'number') {
+      return `https://www.google.com/maps/search/?api=1&query=${settings.lat},${settings.lng}`
+    }
+    const raw = settings?.mapsUrl || ''
+    if (!raw) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+    try {
+      const u = new URL(raw)
+      const mAll = [...u.pathname.matchAll(/3d(-?\d+\.?\d+)!4d(-?\d+\.?\d+)/g)]
+      if (mAll.length) {
+        const last = mAll[mAll.length - 1]
+        return `https://www.google.com/maps/search/?api=1&query=${last[1]},${last[2]}`
+      }
+      const at = u.pathname.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/)
+      if (at) return `https://www.google.com/maps/search/?api=1&query=${at[1]},${at[2]}`
+      const q = u.searchParams.get('q')
+      if (q) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`
+    } catch {}
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+  }
+  const mapsHref = mapsLink()
   const schedule = [
     { d: 'Mon', open: '11:00', close: '22:00' },
     { d: 'Tue', open: '11:00', close: '22:00' },
@@ -39,7 +63,7 @@ export default function Home() {
   const isOpen = mins >= toMinutes(todays.open) && mins <= toMinutes(todays.close)
   return (
     <Page>
-      <SEO title="YoYo Flavor – Home" description="Discover your flavor with YoYo restaurant menu, gallery, reviews, and quiz." locale={locale as any} ogImage={settings?.bannerUrl || '/images/yoyo-new-.png'} />
+      <SEO title="YoYo Flavor – Home" description="Discover your flavor with YoYo restaurant menu, gallery, reviews, and quiz." locale={locale as any} ogImage={settings?.bannerUrl || '/images/yoyo-new-.png'} address={address} />
       <Box sx={{ position: 'relative', height: 420, overflow: 'hidden' }}>
         <motion.img src={settings?.bannerUrl || '/images/yoyo-new-.png'} alt="Banner" style={{ y, width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.7)' }} />
         <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0) 100%)' }} />
@@ -81,9 +105,9 @@ export default function Home() {
           <Grid item xs={12} md={5}>
             <Paper sx={{ p: 3, borderRadius: 3 }} component={motion.div} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
               <Stack spacing={2}>
-                <Button startIcon={<PhoneIcon />} variant="contained" href="tel:+0000000000">Call</Button>
-                <Button startIcon={<WhatsAppIcon />} variant="outlined" href="https://wa.me/0000000000" target="_blank">WhatsApp</Button>
-                <Button startIcon={<PlaceIcon />} variant="text" href="https://maps.google.com" target="_blank">Find us</Button>
+                <Button startIcon={<PhoneIcon />} variant="contained" href={`tel:${phone}`}>Call</Button>
+                <Button startIcon={<WhatsAppIcon />} variant="outlined" href={waLink} target="_blank">WhatsApp</Button>
+                <Button startIcon={<PlaceIcon />} variant="text" href={mapsHref} target="_blank">Find us</Button>
               </Stack>
             </Paper>
           </Grid>

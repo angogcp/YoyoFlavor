@@ -87,6 +87,10 @@ function AdminContent() {
   const { data: settings } = useQuery({ queryKey: ['settings'], queryFn: () => api.getSettings() })
   const [logoUrl, setLogoUrl] = useState(settings?.logoUrl || '')
   const [bannerUrl, setBannerUrl] = useState(settings?.bannerUrl || '')
+  const [address, setAddress] = useState(settings?.address || '')
+  const [mapsUrl, setMapsUrl] = useState(settings?.mapsUrl || '')
+  const [latText, setLatText] = useState('')
+  const [lngText, setLngText] = useState('')
   const [logoFile, setLogoFile] = useState<File | null>(null)
   const [bannerFile, setBannerFile] = useState<File | null>(null)
   const [postsQ, setPostsQ] = useState('')
@@ -95,7 +99,9 @@ function AdminContent() {
     let banner = bannerUrl
     if (logoFile) logo = await api.uploadImage(logoFile)
     if (bannerFile) banner = await api.uploadImage(bannerFile)
-    await api.updateSettings({ logoUrl: logo, bannerUrl: banner })
+    const lat = latText.trim() ? parseFloat(latText.trim()) : undefined
+    const lng = lngText.trim() ? parseFloat(lngText.trim()) : undefined
+    await api.updateSettings({ logoUrl: logo, bannerUrl: banner, address, mapsUrl, lat, lng })
     qc.invalidateQueries({ queryKey: ['settings'] })
   }
   const { data: reviews, fetchNextPage: fetchMoreReviews, hasNextPage: hasMoreReviews, isLoading: reviewsLoading } = useInfiniteQuery({
@@ -141,6 +147,12 @@ function AdminContent() {
             <input id="banner-file" type="file" accept="image/*" style={{ display: 'none' }} onChange={e => setBannerFile(e.target.files?.[0] || null)} />
             <Button variant="outlined" onClick={() => (document.getElementById('banner-file') as HTMLInputElement).click()}>Upload banner</Button>
             <Typography variant="body2">{bannerFile ? bannerFile.name : 'No file selected'}</Typography>
+          </Stack>
+          <TextField label="Shop Address" value={address} onChange={e => setAddress(e.target.value)} />
+          <TextField label="Google Maps URL" value={mapsUrl} onChange={e => setMapsUrl(e.target.value)} helperText="Paste a precise maps link or leave blank to auto-generate from address" />
+          <Stack direction="row" spacing={2}>
+            <TextField label="Latitude" value={latText} onChange={e => setLatText(e.target.value)} placeholder="e.g. 4.7284" />
+            <TextField label="Longitude" value={lngText} onChange={e => setLngText(e.target.value)} placeholder="e.g. 101.1253" />
           </Stack>
           <Button variant="contained" onClick={saveSettings} disabled={!logoUrl || !bannerUrl}>Save Settings</Button>
         </Stack>

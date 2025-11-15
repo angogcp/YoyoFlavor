@@ -30,10 +30,12 @@ export default function Header() {
     <AppBar color="transparent" position="sticky" elevation={trigger ? 4 : 0} sx={{ backdropFilter: 'blur(8px)', backgroundColor: 'rgba(255,255,255,0.6)', ...(mode === 'dark' ? { backgroundColor: 'rgba(18,18,18,0.6)' } : {}) }}>
       <Toolbar sx={{ px: 2 }}>
         <Stack direction="row" alignItems="center" spacing={2} sx={{ flexGrow: 1 }}>
+          <Box component="img" src={settings?.logoUrl || '/images/yoyo logo.png'} alt="YoYo" sx={{ height: 40 }} />
           <Typography variant="h6">YoYo Flavor</Typography>
         </Stack>
         <Stack direction="row" spacing={1}>
           <Button onClick={() => nav(`/${locale}`)}>{t(locale as any, 'home')}</Button>
+          <Button onClick={() => nav(`/${locale}/menu`)}>{t(locale as any, 'menu')}</Button>
           <Button onClick={() => nav(`/${locale}/gallery`)}>{t(locale as any, 'gallery')}</Button>
           <Button onClick={() => nav(`/${locale}/reviews`)}>{t(locale as any, 'reviews')}</Button>
           <Button onClick={() => nav(`/${locale}/blog`)}>{t(locale as any, 'blog')}</Button>

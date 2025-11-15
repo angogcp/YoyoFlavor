@@ -44,7 +44,17 @@ export const db = {
     await writeJson('contacts', value)
   },
   async getSettings() {
-    return readJson<{ logoUrl: string; bannerUrl: string }>('settings', { logoUrl: '/images/yoyo logo.png', bannerUrl: '/images/yoyo-new-.png' })
+    return readJson<{ logoUrl: string; bannerUrl: string; address?: string; mapsUrl?: string; lat?: number; lng?: number }>(
+      'settings',
+      {
+        logoUrl: '/images/yoyo logo.png',
+        bannerUrl: '/images/yoyo-new-.png',
+        address: '324 Jalan Bercham, Taman Medan Bercham, 31400 Ipoh, Perak, Malaysia',
+        mapsUrl: 'https://www.google.com/maps/place/Yoyo+Flavor+Cafe/@4.631922,101.122814,17z/data=!4m12!1m5!3m4!2zNMKwMzcnNTQuOSJOIDEwMcKwMDcnMzEuNCJF!8m2!3d4.6319167!4d101.1253889!3m5!1s0x31cdc0132c0f7d8b:0x5d8bc6b4ca67437c!8m2!3d4.6319072!4d101.126609!16s%2Fg%2F11bwfhys0f?entry=ttu&g_ep=EgoyMDI1MTExMi4wIKXMDSoASAFQAw%3D%3D',
+        lat: 4.6319072,
+        lng: 101.126609
+      }
+    )
   },
   async setSettings(value: any) {
     await writeJson('settings', value)

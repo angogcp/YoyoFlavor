@@ -1,6 +1,6 @@
 import { Box, Container, Grid, Paper, Stack, Typography, Button, TextField, Alert, Divider } from '@mui/material'
 import { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState as useReactState } from 'react'
 import { api } from '../lib/api'
 import Page from '../components/Page'
@@ -15,6 +15,31 @@ export default function Contact() {
   const [checkResult, setCheckResult] = useReactState<{ status: string; reply?: string; date?: string } | null>(null)
   const submit = useMutation({ mutationFn: () => api.submitContact(name.trim(), email.trim(), message.trim()), onSuccess: (item) => { setStatus('success'); setName(''); setEmail(''); setMessage(''); setRefId(item.id) }, onError: () => setStatus('error') })
   const valid = !!(name.trim() && email.includes('@') && message.trim().length >= 3)
+  const { data: settings } = useQuery({ queryKey: ['settings'], queryFn: () => api.getSettings() })
+  const address = settings?.address || '324 Jalan Bercham, Taman Medan Bercham, 31400 Ipoh, Perak, Malaysia'
+  const phone = '0125200357'
+  const waLink = `https://wa.me/${phone.replace(/^0/, '60')}`
+  function mapsLink() {
+    if (typeof (settings as any)?.lat === 'number' && typeof (settings as any)?.lng === 'number') {
+      return `https://www.google.com/maps/search/?api=1&query=${(settings as any).lat},${(settings as any).lng}`
+    }
+    const raw = settings?.mapsUrl || ''
+    if (!raw) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+    try {
+      const u = new URL(raw)
+      const mAll = [...u.pathname.matchAll(/3d(-?\d+\.?\d+)!4d(-?\d+\.?\d+)/g)]
+      if (mAll.length) {
+        const last = mAll[mAll.length - 1]
+        return `https://www.google.com/maps/search/?api=1&query=${last[1]},${last[2]}`
+      }
+      const at = u.pathname.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/)
+      if (at) return `https://www.google.com/maps/search/?api=1&query=${at[1]},${at[2]}`
+      const q = u.searchParams.get('q')
+      if (q) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`
+    } catch {}
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+  }
+  const mapsHref = mapsLink()
   return (
     <Page>
     <Container sx={{ py: 6 }}>
@@ -26,9 +51,9 @@ export default function Contact() {
             <Stack spacing={2}>
               <Box component="img" src="/images/yoyo intro.png" alt="Intro" sx={{ width: '100%', borderRadius: 2 }} />
               <Stack direction="row" spacing={2}>
-                <Button variant="contained" href="tel:+0000000000">Call</Button>
-                <Button variant="outlined" href="https://wa.me/0000000000" target="_blank">WhatsApp</Button>
-                <Button variant="text" href="https://maps.google.com" target="_blank">Find us</Button>
+                <Button variant="contained" href={`tel:${phone}`}>Call</Button>
+                <Button variant="outlined" href={waLink} target="_blank">WhatsApp</Button>
+                <Button variant="text" href={mapsHref} target="_blank">Find us</Button>
               </Stack>
             </Stack>
           </Paper>
