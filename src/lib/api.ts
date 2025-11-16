@@ -12,6 +12,7 @@ async function json<T>(res: Response): Promise<T> {
 const isDev = import.meta.env.DEV
 
 import { posts as seededPosts } from '../data/posts'
+import { reviews as seededReviews } from '../data/reviews'
 
 function lsGet<T>(key: string, seed: T): T {
   const s = localStorage.getItem(key)
@@ -69,10 +70,26 @@ export const api = {
     const key = localStorage.getItem('admin:key') || ''
     await fetch(`/api/posts?slug=${encodeURIComponent(slug)}`, { method: 'DELETE', headers: { 'x-admin-key': key } })
   },
-  async getReviews(): Promise<Review[]> {
+  async getReviews(locale?: 'en' | 'zh'): Promise<Review[]> {
     if (isDev) {
-      const list = lsGet<Review[]>('reviews', [])
-      return list.filter(r => (r.status ?? 'published') === 'published')
+      const list = lsGet<Review[]>('reviews', seededReviews)
+      const published = list.filter(r => (r.status ?? 'published') === 'published')
+      if (locale === 'zh') {
+        const map: Record<string, string> = {
+          rv1: '汤底浓郁暖心，服务贴心又迅速。',
+          rv2: '手工拉面劲道十足，还会再来！',
+          rv3: '小吃酥脆，和朋友一起很惬意。',
+          rv4: '日式风味平衡又新鲜。',
+          rv5: '面包与锅炒香气十足，很满足。',
+          rv6: '西式餐点有质感，价格亲民。',
+          rv7: '饮品清爽，和辣菜很搭。',
+          rv8: '火锅配料很足，汤底层次棒。',
+          rv9: '员工亲切，环境干净，是个放松的好地方。',
+          rv10: '城里最好吃的面条口感，强烈推荐！'
+        }
+        return published.map(r => ({ ...r, comment: map[r.id] || r.comment }))
+      }
+      return published
     }
     try {
       const res = await fetch('/api/reviews')
@@ -82,11 +99,26 @@ export const api = {
       return []
     }
   },
-  async getReviewsPaged(offset: number, limit: number): Promise<{ total: number; items: Review[] }> {
+  async getReviewsPaged(offset: number, limit: number, locale?: 'en' | 'zh'): Promise<{ total: number; items: Review[] }> {
     if (isDev) {
-      const list = lsGet<Review[]>('reviews', [])
+      const list = lsGet<Review[]>('reviews', seededReviews)
       const published = list.filter(r => (r.status ?? 'published') === 'published')
-      const items = published.slice(offset, offset + limit)
+      let items = published.slice(offset, offset + limit)
+      if (locale === 'zh') {
+        const map: Record<string, string> = {
+          rv1: '汤底浓郁暖心，服务贴心又迅速。',
+          rv2: '手工拉面劲道十足，还会再来！',
+          rv3: '小吃酥脆，和朋友一起很惬意。',
+          rv4: '日式风味平衡又新鲜。',
+          rv5: '面包与锅炒香气十足，很满足。',
+          rv6: '西式餐点有质感，价格亲民。',
+          rv7: '饮品清爽，和辣菜很搭。',
+          rv8: '火锅配料很足，汤底层次棒。',
+          rv9: '员工亲切，环境干净，是个放松的好地方。',
+          rv10: '城里最好吃的面条口感，强烈推荐！'
+        }
+        items = items.map(r => ({ ...r, comment: map[r.id] || r.comment }))
+      }
       return { total: published.length, items }
     }
     try {

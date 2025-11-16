@@ -9,9 +9,14 @@ import type { Review as ReviewType } from '../lib/api'
 export default function Reviews() {
   const qc = useQueryClient()
   const pageSize = 9
+  function useLocale() {
+    const seg = window.location.pathname.split('/')[1]
+    return seg === 'zh' ? 'zh' : 'en'
+  }
+  const locale = useLocale()
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ['reviews'],
-    queryFn: ({ pageParam = 0 }) => api.getReviewsPaged(pageParam, pageSize),
+    queryFn: ({ pageParam = 0 }) => api.getReviewsPaged(pageParam, pageSize, locale as any),
     getNextPageParam: (lastPage, pages) => {
       const loaded = pages.reduce((acc, p) => acc + p.items.length, 0)
       return loaded < lastPage.total ? loaded : undefined

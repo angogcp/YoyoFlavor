@@ -26,7 +26,8 @@ export const db = {
     await writeJson('posts', value)
   },
   async getReviews() {
-    return readJson<any[]>('reviews', [])
+    const seed = (await import('../src/data/reviews')).reviews
+    return readJson<any[]>('reviews', seed)
   },
   async setReviews(value: any) {
     await writeJson('reviews', value)

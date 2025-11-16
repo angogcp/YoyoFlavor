@@ -1,4 +1,4 @@
-import { Box, Container, Stack, Typography, Button, Paper, Chip, Grid, Divider } from '@mui/material'
+import { Box, Container, Stack, Typography, Button, Paper, Chip, Grid, Divider, Card, CardContent, Rating } from '@mui/material'
 import PhoneIcon from '@mui/icons-material/Phone'
 import WhatsAppIcon from '@mui/icons-material/WhatsApp'
 import PlaceIcon from '@mui/icons-material/Place'
@@ -22,6 +22,7 @@ export default function Home() {
   const { scrollY } = useScroll()
   const y = useTransform(scrollY, [0, 300], [0, -30])
   const { data: settings } = useQuery({ queryKey: ['settings'], queryFn: () => api.getSettings() })
+  const { data: topReviews } = useQuery({ queryKey: ['home-reviews', locale], queryFn: () => api.getReviews(locale as any) })
   const address = settings?.address || '324 Jalan Bercham, Taman Medan Bercham, 31400 Ipoh, Perak, Malaysia'
   const phone = '0125200357'
   const waLink = `https://wa.me/${phone.replace(/^0/, '60')}`
@@ -78,6 +79,22 @@ export default function Home() {
         </Container>
       </Box>
       <Container sx={{ py: 6 }}>
+        <Typography variant="h5" sx={{ mb: 2 }}>What people say</Typography>
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          {(topReviews || []).slice(0,3).map(r => (
+            <Grid item xs={12} md={4} key={r.id}>
+              <Card sx={{ borderRadius: 3 }}>
+                <CardContent>
+                  <Stack spacing={1}>
+                    <Typography variant="subtitle1">{r.name}</Typography>
+                    <Rating value={r.rating} readOnly />
+                    <Typography variant="body2" color="text.secondary">{r.comment}</Typography>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
         <Typography variant="h5" sx={{ mb: 2 }}>{t(locale as any, 'hours')}</Typography>
         <Grid container spacing={3}>
           <Grid item xs={12} md={7}>
