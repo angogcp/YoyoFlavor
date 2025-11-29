@@ -156,6 +156,41 @@ export default function Home() {
         </Grid>
       </Container>
 
+      {/* Video Highlights */}
+      <Box sx={{ bgcolor: 'background.paper', py: 8 }}>
+        <Container>
+          <Typography variant="h4" fontWeight="bold" sx={{ mb: 6, textAlign: 'center' }}>{t(locale as any, 'video_highlights')}</Typography>
+          <Grid container spacing={4} justifyContent="center">
+            <Grid item xs={12} md={6}>
+              <Box component={motion.div} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+                <Box 
+                  component="video" 
+                  controls 
+                  poster="/images/yoyoBanner.png"
+                  sx={{ width: '100%', borderRadius: 4, boxShadow: 6, bgcolor: 'black', aspectRatio: '16/9' }}
+                >
+                  <source src="/images/promo-video-1.webm" type="video/webm" />
+                  Your browser does not support the video tag.
+                </Box>
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Box component={motion.div} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.2 }}>
+                <Box 
+                  component="video" 
+                  controls 
+                  poster="/images/yoyo-new-.png"
+                  sx={{ width: '100%', borderRadius: 4, boxShadow: 6, bgcolor: 'black', aspectRatio: '16/9' }}
+                >
+                  <source src="/images/promo-video-2.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
+
       {/* Featured Menu */}
       <Box sx={{ bgcolor: 'action.hover', py: 10 }}>
         <Container>

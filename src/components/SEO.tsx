@@ -86,7 +86,7 @@ export default function SEO({ title, description, locale = 'en', canonicalPath, 
       image: ogImage || canonicalHref,
       servesCuisine: ['Chinese','Japanese','Western'],
       url: window.location.origin,
-      address: { '@type': 'PostalAddress', streetAddress: address || '123 YoYo Street' },
+      address: { '@type': 'PostalAddress', streetAddress: address || '324 Jalan Bercham, Taman Medan Bercham, 31400 Ipoh, Perak, Malaysia' },
       openingHours: ['Mo-Fr 11:00-22:00','Sa-Su 10:00-23:00']
     }
     let script = document.getElementById('ld-json') as HTMLScriptElement | null

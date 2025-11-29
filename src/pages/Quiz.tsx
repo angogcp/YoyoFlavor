@@ -1,6 +1,7 @@
 import { Container, Stepper, Step, StepLabel, Box, Typography, Button, Stack, Card, CardMedia, CardContent } from '@mui/material'
 import { useState } from 'react'
 import Page from '../components/Page'
+import SEO from '../components/SEO'
 import { useLocation } from 'react-router-dom'
 import { t } from '../i18n'
 
@@ -96,6 +97,7 @@ export default function Quiz() {
   return (
     <Page>
     <Container sx={{ py: 6 }}>
+      <SEO title="YoYo Flavor – Quiz" description="Find your perfect flavor match with our fun quiz." locale={locale as any} />
       <Typography variant="h4" sx={{ mb: 2 }}>{t(locale, 'quiz')}</Typography>
       <Stepper activeStep={Math.min(active, steps.length)} sx={{ mb: 1 }}>
         {steps.map((s) => (

@@ -76,7 +76,8 @@ const en: Dict = {
   our_menu: 'Our Menu',
   menu_subtitle: 'Explore a world of flavors, from comforting classics to adventurous new tastes.',
   gallery_title: 'Our Gallery',
-  gallery_subtitle: 'A glimpse into the vibrant life and flavors at YoYo.'
+  gallery_subtitle: 'A glimpse into the vibrant life and flavors at YoYo.',
+  video_highlights: 'Video Highlights'
 }
 
 const zh: Dict = {
@@ -155,7 +156,8 @@ const zh: Dict = {
   our_menu: '我们的菜单',
   menu_subtitle: '探索风味世界，从舒适经典到大胆尝新。',
   gallery_title: '我们的图库',
-  gallery_subtitle: '一瞥 YoYo 的活力生活与美味瞬间。'
+  gallery_subtitle: '一瞥 YoYo 的活力生活与美味瞬间。',
+  video_highlights: '精彩视频'
 }
 
 export function t(locale: 'en' | 'zh', key: keyof typeof en) {

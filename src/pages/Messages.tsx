@@ -1,6 +1,7 @@
 import { Container, Stack, TextField, Button, Typography, Card, CardContent } from '@mui/material'
 import { useState } from 'react'
 import Page from '../components/Page'
+import SEO from '../components/SEO'
 import { api } from '../lib/api'
 
 export default function Messages() {
@@ -9,6 +10,7 @@ export default function Messages() {
   return (
     <Page>
       <Container sx={{ py: 6 }}>
+        <SEO title="YoYo Flavor – Messages" description="Check the status of your message." />
         <Typography variant="h4" sx={{ mb: 2 }}>Message Center</Typography>
         <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
           <TextField label="Reference ID" value={id} onChange={e => setId(e.target.value)} />

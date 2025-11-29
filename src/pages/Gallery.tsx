@@ -3,6 +3,7 @@ import {
 } from '@mui/material'
 import { useState, useEffect, useCallback } from 'react'
 import Page from '../components/Page'
+import SEO from '../components/SEO'
 import { motion, AnimatePresence } from 'framer-motion'
 import Masonry from '@mui/lab/Masonry'
 import CloseIcon from '@mui/icons-material/Close'
@@ -63,6 +64,11 @@ export default function Gallery() {
 
   return (
     <Page>
+      <SEO 
+        title="YoYo Flavor – Gallery" 
+        description="Explore the vibrant atmosphere and delicious dishes at YoYo Flavor." 
+        locale={locale as any} 
+      />
       {/* Hero Section */}
       <Box sx={{ 
         position: 'relative', 

@@ -4,6 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState as useReactState } from 'react'
 import { api } from '../lib/api'
 import Page from '../components/Page'
+import SEO from '../components/SEO'
 
 export default function Contact() {
   const [name, setName] = useState('')
@@ -43,6 +44,7 @@ export default function Contact() {
   return (
     <Page>
     <Container sx={{ py: 6 }}>
+      <SEO title="YoYo Flavor – Contact" description="Get in touch with us. Visit, call, or message." locale="en" />
       <Typography variant="h4" sx={{ mb: 1 }}>Contact</Typography>
       <Divider sx={{ mb: 3 }} />
       <Grid container spacing={2}>

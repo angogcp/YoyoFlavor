@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import Page from '../components/Page'
+import SEO from '../components/SEO'
 import { useState } from 'react'
 import type { Review as ReviewType } from '../lib/api'
 
@@ -48,6 +49,7 @@ export default function Reviews() {
   return (
     <Page>
     <Container sx={{ py: 6 }}>
+      <SEO title="YoYo Flavor – Reviews" description="Read what our customers say about us." locale={locale as any} />
       <Typography variant="h4" sx={{ mb: 1 }}>Reviews</Typography>
       <Divider sx={{ mb: 2 }} />
       <Typography variant="body2" sx={{ mb: 1 }}>{items.length} of {total} shown</Typography>
