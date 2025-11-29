@@ -49,12 +49,34 @@ const en: Dict = {
   filter_soft: 'Soft',
   filter_light: 'Light',
   filter_adventurous: 'Adventurous',
+  filter_clear: 'Clear',
   recommended_for_you: 'Recommended for you'
   ,sort_by: 'Sort by',
   sort_relevance: 'Relevance',
   sort_likes: 'Likes',
   sort_alpha: 'A–Z',
-  view_image: 'View'
+  view_image: 'View',
+  cat_noodles: 'Noodles & Rice',
+  cat_noodles_desc: 'Delicious noodles and aromatic rice dishes served with savory broths and fresh toppings.',
+  cat_hotpot: 'Hot Pot',
+  cat_hotpot_desc: 'A communal dining experience with simmering pots of spicy broth and premium ingredients.',
+  cat_snacks: 'Snacks',
+  cat_snacks_desc: 'Crispy, savory bites perfect for sharing or a quick treat on the go.',
+  cat_bread: 'Bread & Wok Fried',
+  cat_bread_desc: 'Freshly baked breads and wok-tossed stir-fries full of "wok hei" flavor.',
+  cat_japanese: 'Japanese Flavor',
+  cat_japanese_desc: 'Delicate and balanced flavors inspired by traditional Japanese cuisine.',
+  cat_western: 'Western',
+  cat_western_desc: 'Classic western favorites with a unique Yoyo twist.',
+  cat_beverage: 'Beverage',
+  cat_beverage_desc: 'Refreshing drinks, teas, and specialty beverages to quench your thirst.',
+  cat_japanese2: 'Japanese Flavor II',
+  cat_japanese2_desc: 'More exquisite selections from our Japanese inspired collection.',
+  cta_love: 'Love This Flavor!',
+  our_menu: 'Our Menu',
+  menu_subtitle: 'Explore a world of flavors, from comforting classics to adventurous new tastes.',
+  gallery_title: 'Our Gallery',
+  gallery_subtitle: 'A glimpse into the vibrant life and flavors at YoYo.'
 }
 
 const zh: Dict = {
@@ -106,12 +128,34 @@ const zh: Dict = {
   filter_soft: '柔软',
   filter_light: '清爽',
   filter_adventurous: '冒险',
+  filter_clear: '清除',
   recommended_for_you: '为你推荐'
   ,sort_by: '排序',
   sort_relevance: '相关度',
   sort_likes: '点赞数',
   sort_alpha: 'A–Z',
-  view_image: '查看'
+  view_image: '查看',
+  cat_noodles: '面食与米饭',
+  cat_noodles_desc: '美味面食和香浓米饭，配以鲜美的汤底和新鲜配料。',
+  cat_hotpot: '火锅',
+  cat_hotpot_desc: '大家围坐一起，享受热气腾腾的香辣汤底和优质食材。',
+  cat_snacks: '小吃',
+  cat_snacks_desc: '酥脆可口的小食，适合分享或随时享用。',
+  cat_bread: '面点与爆炒',
+  cat_bread_desc: '新鲜出炉的面点和镬气十足的爆炒菜肴。',
+  cat_japanese: '日式风味',
+  cat_japanese_desc: '源自传统日本料理的精致均衡风味。',
+  cat_western: '西式佳肴',
+  cat_western_desc: '经典西式美味，融入Yoyo独特的风味转折。',
+  cat_beverage: '饮品',
+  cat_beverage_desc: '清爽饮料、茶饮和特色饮品，为您解渴。',
+  cat_japanese2: '日式风味 II',
+  cat_japanese2_desc: '更多来自我们日式系列的精致选择。',
+  cta_love: '我爱这个味道！',
+  our_menu: '我们的菜单',
+  menu_subtitle: '探索风味世界，从舒适经典到大胆尝新。',
+  gallery_title: '我们的图库',
+  gallery_subtitle: '一瞥 YoYo 的活力生活与美味瞬间。'
 }
 
 export function t(locale: 'en' | 'zh', key: keyof typeof en) {

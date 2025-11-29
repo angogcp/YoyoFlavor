@@ -107,9 +107,9 @@ export default function Quiz() {
         <Stack spacing={2}>
           <Typography variant="h6">{steps[active]}</Typography>
           <Typography variant="body2" color="text.secondary">{stepDescriptions[active]}</Typography>
-          <Stack direction="row" spacing={3} sx={{ mt: 1 }}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} sx={{ mt: 1 }}>
             {optionSets[active].map(opt => (
-              <Stack key={opt.label} spacing={0.5} alignItems="flex-start">
+              <Stack key={opt.label} spacing={0.5} alignItems={{ xs: 'stretch', sm: 'flex-start' }} sx={{ width: { xs: '100%', sm: 'auto' } }}>
                 <Button variant={opt.value === 3 ? 'contained' : opt.value === 2 ? 'outlined' : 'text'} onClick={() => pick(opt.value)}>{opt.label}</Button>
                 <Typography variant="caption" color="text.secondary">{opt.desc}</Typography>
               </Stack>

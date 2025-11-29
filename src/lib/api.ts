@@ -77,7 +77,7 @@ export const api = {
       if (locale === 'zh') {
         const map: Record<string, string> = {
           rv1: '汤底浓郁暖心，服务贴心又迅速。',
-          rv2: '手工拉面劲道十足，还会再来！',
+          rv2: '美味面条劲道十足，还会再来！',
           rv3: '小吃酥脆，和朋友一起很惬意。',
           rv4: '日式风味平衡又新鲜。',
           rv5: '面包与锅炒香气十足，很满足。',
@@ -107,7 +107,7 @@ export const api = {
       if (locale === 'zh') {
         const map: Record<string, string> = {
           rv1: '汤底浓郁暖心，服务贴心又迅速。',
-          rv2: '手工拉面劲道十足，还会再来！',
+          rv2: '美味面条劲道十足，还会再来！',
           rv3: '小吃酥脆，和朋友一起很惬意。',
           rv4: '日式风味平衡又新鲜。',
           rv5: '面包与锅炒香气十足，很满足。',

@@ -24,7 +24,7 @@ export const posts: Post[] = [
   {
     slug: 'noodle-art',
     title: 'The Art of Noodles',
-    excerpt: 'Hand-pulled noodles and rich sauces.',
+    excerpt: 'Freshly made noodles and rich sauces.',
     date: '2025-11-10',
     image: '/images/Noodles and rice.jpg'
   }
