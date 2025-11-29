@@ -2,25 +2,28 @@ import { Container, Stack, TextField, Button, Typography, Card, CardContent, Car
 import { useState } from 'react'
 import { useQueryClient, useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
-import { useLocation } from 'react-router-dom'
-
 export default function Admin() {
-  const loc = useLocation()
-  const [pass, setPass] = useState(() => {
-    const p = new URLSearchParams(loc.search).get('passkey') || localStorage.getItem('admin:passkey') || ''
-    if (p === 'ahpin') localStorage.setItem('admin:passkey', 'ahpin')
-    return p
-  })
+  const [authorized, setAuthorized] = useState(false)
   const [passInput, setPassInput] = useState('')
-  const allowed = pass === 'ahpin'
-  if (!allowed) {
+
+  if (!authorized) {
     return (
-      <Container sx={{ py: 6 }}>
-        <Typography variant="h4" sx={{ mb: 2 }}>Admin Access</Typography>
-        <Stack spacing={2} sx={{ maxWidth: 360 }}>
-          <TextField label="Passkey" type="password" value={passInput} onChange={e => setPassInput(e.target.value)} />
-          <Button variant="contained" onClick={() => { if (passInput.trim() === 'ahpin') { localStorage.setItem('admin:passkey', 'ahpin'); setPass('ahpin') } }}>Enter</Button>
-          <Typography variant="body2" color="text.secondary">You can also access by visiting /admin?passkey=ahpin</Typography>
+      <Container sx={{ py: 6, maxWidth: 400 }}>
+        <Typography variant="h4" sx={{ mb: 4 }}>Admin Access</Typography>
+        <Stack spacing={2}>
+          <TextField 
+            label="Enter Passkey" 
+            type="password" 
+            value={passInput} 
+            onChange={e => setPassInput(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' && passInput === 'ahpin') setAuthorized(true) }}
+          />
+          <Button 
+            variant="contained" 
+            onClick={() => { if (passInput === 'ahpin') setAuthorized(true) }}
+          >
+            Login
+          </Button>
         </Stack>
       </Container>
     )

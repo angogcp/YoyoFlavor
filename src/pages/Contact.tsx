@@ -55,6 +55,7 @@ export default function Contact() {
               <Stack direction="row" spacing={2}>
                 <Button variant="contained" href={`tel:${phone}`}>Call</Button>
                 <Button variant="outlined" href={waLink} target="_blank">WhatsApp</Button>
+                <Button variant="outlined" href="https://www.facebook.com/yoyoflavor/" target="_blank">Facebook</Button>
                 <Button variant="text" href={mapsHref} target="_blank">Find us</Button>
               </Stack>
             </Stack>
