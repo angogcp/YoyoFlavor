@@ -2,7 +2,7 @@ import {
   Box, Container, Grid, Card, CardMedia, CardContent, Typography, TextField,
   Stack, Button, Dialog, DialogContent, Divider, Chip, Skeleton,
   FormControl, InputLabel, Select, MenuItem, InputAdornment, IconButton,
-  useTheme, useMediaQuery, Fab, Tooltip
+  useTheme, useMediaQuery, Fab, Tooltip, Switch, FormControlLabel
 } from '@mui/material'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
@@ -53,6 +53,7 @@ export default function Menu() {
   
   useEffect(() => { try { setRecommended(localStorage.getItem('quiz:last')) } catch {} }, [])
   
+  const [useGhibli, setUseGhibli] = useState(false)
   const [sort, setSort] = useState<'relevance' | 'likes' | 'alpha'>('relevance')
   const qc = useQueryClient()
   const theme = useTheme()
@@ -88,27 +89,23 @@ export default function Menu() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['likes'] })
   })
 
-  const [open, setOpen] = useState(false)
-  const [activeItem, setActiveItem] = useState<typeof categories[number] | null>(null)
+  const [selectedIndex, setSelectedIndex] = useState(0)
 
-  const handleOpen = (item: typeof categories[number]) => {
-    setActiveItem(item)
-    setOpen(true)
-  }
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
+  // Reset index when list changes if out of bounds
+  useEffect(() => {
+    if (selectedIndex >= list.length && list.length > 0) {
+      setSelectedIndex(0)
     }
+  }, [list.length, selectedIndex])
+
+  const activeCategory = list[selectedIndex]
+
+  const handleNext = () => {
+    if (selectedIndex < list.length - 1) setSelectedIndex(selectedIndex + 1)
   }
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } }
+  const handlePrev = () => {
+    if (selectedIndex > 0) setSelectedIndex(selectedIndex - 1)
   }
 
   return (
@@ -145,7 +142,7 @@ export default function Menu() {
         </Container>
       </Box>
 
-      <Container maxWidth="lg" sx={{ pb: 8 }}>
+      <Container maxWidth="xl" sx={{ pb: 8 }}>
         {/* Control Bar */}
         <Card sx={{ 
           p: 2, 
@@ -228,263 +225,132 @@ export default function Menu() {
                     <MenuItem value="alpha">{t(locale as any, 'sort_alpha')}</MenuItem>
                   </Select>
                 </FormControl>
+                <FormControlLabel
+                  control={<Switch checked={useGhibli} onChange={e => setUseGhibli(e.target.checked)} />}
+                  label={<Typography variant="body2" fontWeight="bold">Ghibli Style</Typography>}
+                />
               </Stack>
             </Grid>
           </Grid>
-          
-          {recommended && (
-            <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <RestaurantMenuIcon fontSize="small" color="secondary" />
-              <Typography variant="body2" color="text.secondary">
-                {t(locale as any, 'recommended_for_you')}: <strong>{recommended}</strong>
-              </Typography>
-            </Box>
-          )}
         </Card>
 
-        {/* Menu Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <Grid container spacing={3}>
-            <AnimatePresence>
-              {list.map((c) => (
-                <Grid item xs={12} sm={6} md={4} key={c.title}>
-                  <motion.div variants={itemVariants} layoutId={c.title}>
-                    <Card 
-                      sx={{ 
-                        height: '100%', 
-                        display: 'flex', 
-                        flexDirection: 'column',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        '&:hover': {
-                          transform: 'translateY(-8px)',
-                          boxShadow: '0 12px 40px rgba(0,0,0,0.12)'
-                        },
-                        position: 'relative',
-                        overflow: 'hidden',
-                        borderRadius: 4,
-                        border: '1px solid',
-                        borderColor: 'divider'
-                      }}
-                    >
-                      <Box sx={{ position: 'relative', overflow: 'hidden', pt: '120%' }}>
-                        <CardMedia 
+        {/* Menu Book View */}
+        {list.length > 0 && activeCategory ? (
+          <Grid container spacing={4} sx={{ minHeight: '600px' }}>
+            {/* Table of Contents (Sidebar) */}
+            <Grid item xs={12} md={3}>
+              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 3, overflow: 'hidden' }}>
+                <Box sx={{ p: 2, bgcolor: 'primary.main', color: 'white' }}>
+                  <Typography variant="h6" fontWeight="bold">Menu Sections</Typography>
+                </Box>
+                <Box sx={{ flex: 1, overflowY: 'auto', p: 1 }}>
+                  <Stack spacing={1}>
+                    {list.map((item, index) => (
+                      <Button
+                        key={item.title}
+                        fullWidth
+                        variant={index === selectedIndex ? 'contained' : 'text'}
+                        color={index === selectedIndex ? 'primary' : 'inherit'}
+                        onClick={() => setSelectedIndex(index)}
+                        sx={{ 
+                          justifyContent: 'flex-start', 
+                          textAlign: 'left',
+                          py: 1.5,
+                          px: 2,
+                          borderRadius: 2,
+                          fontWeight: index === selectedIndex ? 700 : 400
+                        }}
+                      >
+                        {t(locale as any, item.id as any)}
+                      </Button>
+                    ))}
+                  </Stack>
+                </Box>
+              </Card>
+            </Grid>
+
+            {/* Menu Page Viewer */}
+            <Grid item xs={12} md={9}>
+              <Card sx={{ 
+                height: '100%', 
+                minHeight: 600,
+                borderRadius: 3, 
+                position: 'relative', 
+                overflow: 'hidden',
+                bgcolor: '#f5f5f5',
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeCategory.title}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}
+                  >
+                     {/* Header of Page */}
+                     <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', bgcolor: 'white', borderBottom: '1px solid', borderColor: 'divider' }}>
+                        <Typography variant="h5" fontWeight="bold">{t(locale as any, activeCategory.id as any)}</Typography>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                           <Tooltip title="Like this category">
+                              <IconButton onClick={() => likeMut.mutate(`category:${activeCategory.title}`)} color="secondary">
+                                {(likes.data?.[activeCategory.title] ?? 0) > 0 ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                              </IconButton>
+                           </Tooltip>
+                           <Typography variant="body2" fontWeight="bold">{likes.data?.[activeCategory.title] ?? 0}</Typography>
+                        </Stack>
+                     </Box>
+
+                     {/* Page Content (Image) */}
+                     <Box sx={{ flex: 1, position: 'relative', bgcolor: '#222', overflow: 'auto', display: 'flex', alignItems: 'start', justifyContent: 'center' }}>
+                        <Box 
                           component="img" 
-                          image={c.image} 
-                          alt={t(locale as any, c.id as any)} 
-                          onClick={() => handleOpen(c)} 
+                          src={useGhibli && (activeCategory as any).ghibliImage ? (activeCategory as any).ghibliImage : activeCategory.image} 
+                          alt={activeCategory.title}
                           sx={{ 
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            height: '100%', 
                             width: '100%', 
-                            objectFit: 'cover',
-                            objectPosition: 'top',
-                            cursor: 'pointer',
-                            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-                            '&:hover': {
-                              transform: 'scale(1.08)'
-                            }
+                            height: 'auto', 
+                            maxWidth: '100%',
+                            display: 'block',
+                            boxShadow: 3
                           }} 
                         />
-                        <Box 
-                          sx={{ 
-                            position: 'absolute', 
-                            top: 16, 
-                            right: 16, 
-                            zIndex: 2 
-                          }}
+                     </Box>
+
+                     {/* Navigation Footer */}
+                     <Box sx={{ p: 2, bgcolor: 'white', borderTop: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Button 
+                          disabled={selectedIndex === 0} 
+                          onClick={handlePrev}
+                          startIcon={<span>←</span>}
                         >
-                           <Tooltip title="Like">
-                            <Fab 
-                              size="small" 
-                              color="inherit"
-                              onClick={(e) => { e.stopPropagation(); likeMut.mutate(`category:${c.title}`) }}
-                              sx={{ 
-                                bgcolor: 'rgba(255, 255, 255, 0.9)', 
-                                backdropFilter: 'blur(4px)',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                '&:hover': { bgcolor: 'white' }
-                              }}
-                            >
-                              {likes.data?.[c.title] ? <FavoriteIcon color="error" /> : <FavoriteBorderIcon />}
-                            </Fab>
-                           </Tooltip>
-                        </Box>
-                        {recommended === c.title && (
-                          <Chip 
-                            color="secondary" 
-                            size="small" 
-                            label={t(locale as any, 'recommended_for_you')}
-                            sx={{ 
-                              position: 'absolute', 
-                              top: 16, 
-                              left: 16,
-                              fontWeight: 'bold',
-                              boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                            }} 
-                          />
-                        )}
-                      </Box>
-
-                      <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 3 }}>
-                        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 1 }}>
-                          <Typography variant="h6" component="h3" fontWeight="bold" sx={{ fontSize: '1.25rem', lineHeight: 1.3 }}>
-                            {t(locale as any, c.id as any)}
-                          </Typography>
-                          <Stack direction="row" alignItems="center" spacing={0.5} sx={{ color: 'text.secondary', bgcolor: 'action.hover', px: 1, py: 0.5, borderRadius: 2 }}>
-                            <FavoriteIcon sx={{ fontSize: 14, color: 'error.main', opacity: 0.8 }} />
-                            <Typography variant="caption" fontWeight="bold">
-                              {likes.isLoading ? '...' : (likes.data?.[c.title] ?? 0)}
-                            </Typography>
-                          </Stack>
-                        </Stack>
-                        
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5, flexGrow: 1, lineHeight: 1.6 }}>
-                          {t(locale as any, `${c.id}_desc` as any)}
+                          Previous
+                        </Button>
+                        <Typography variant="body2" color="text.secondary">
+                          Page {selectedIndex + 1} of {list.length}
                         </Typography>
-
-                        <Divider sx={{ mb: 2, borderColor: 'divider' }} />
-
-                        <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ gap: 0.8 }}>
-                          {((c as any).tags || []).map((tag: string) => (
-                            <Chip 
-                              key={tag} 
-                              size="small" 
-                              variant="filled"
-                              label={
-                                tag === 'spicy' ? t(locale as any, 'filter_spicy') :
-                                tag === 'comfort' ? t(locale as any, 'filter_comfort') :
-                                tag === 'quick' ? t(locale as any, 'filter_quick') :
-                                tag === 'crunchy' ? t(locale as any, 'filter_crunchy') :
-                                tag === 'soft' ? t(locale as any, 'filter_soft') :
-                                tag === 'light' ? t(locale as any, 'filter_light') :
-                                tag === 'adventurous' ? t(locale as any, 'filter_adventurous') : tag
-                              }
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelected(selected.includes(tag) ? selected.filter(x => x !== tag) : [...selected, tag])
-                              }}
-                              sx={{ 
-                                borderRadius: 1.5,
-                                height: 26,
-                                fontSize: '0.75rem',
-                                fontWeight: 500,
-                                bgcolor: selected.includes(tag) ? 'primary.main' : 'action.hover',
-                                color: selected.includes(tag) ? 'primary.contrastText' : 'text.primary',
-                                '&:hover': {
-                                  bgcolor: selected.includes(tag) ? 'primary.dark' : 'action.selected'
-                                }
-                              }}
-                            />
-                          ))}
-                        </Stack>
-                      </CardContent>
-                    </Card>
+                        <Button 
+                          disabled={selectedIndex === list.length - 1} 
+                          onClick={handleNext}
+                          endIcon={<span>→</span>}
+                        >
+                          Next
+                        </Button>
+                     </Box>
                   </motion.div>
-                </Grid>
-              ))}
-            </AnimatePresence>
+                </AnimatePresence>
+              </Card>
+            </Grid>
           </Grid>
-        </motion.div>
+        ) : (
+          <Box sx={{ textAlign: 'center', py: 8 }}>
+            <Typography variant="h6" color="text.secondary">No menu items found matching your criteria.</Typography>
+            <Button variant="outlined" sx={{ mt: 2 }} onClick={() => { setQ(''); setSelected([]); }}>Clear Filters</Button>
+          </Box>
+        )}
 
-        {/* Detail Modal */}
-        <Dialog 
-          open={open} 
-          onClose={() => setOpen(false)} 
-          maxWidth="md" 
-          fullWidth
-          PaperProps={{
-            sx: { borderRadius: 4, overflow: 'hidden' }
-          }}
-        >
-          {activeItem && (
-            <>
-              <Box sx={{ position: 'relative' }}>
-                <IconButton 
-                  onClick={() => setOpen(false)}
-                  sx={{ 
-                    position: 'absolute', 
-                    right: 16, 
-                    top: 16, 
-                    bgcolor: 'rgba(0,0,0,0.5)', 
-                    color: 'white', 
-                    backdropFilter: 'blur(4px)',
-                    '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' }, 
-                    zIndex: 10 
-                  }}
-                >
-                  <CloseIcon />
-                </IconButton>
-                <Box sx={{ bgcolor: 'background.default', display: 'flex', justifyContent: 'center', p: 0 }}>
-                  <CardMedia 
-                    component="img" 
-                    image={activeItem.image} 
-                    alt={t(locale as any, activeItem.id as any)} 
-                    sx={{ 
-                      maxHeight: '70vh',
-                      width: '100%',
-                      objectFit: 'contain'
-                    }} 
-                  />
-                </Box>
-              </Box>
-              <DialogContent sx={{ p: 4 }}>
-                <Typography variant="h4" component="h2" fontWeight="bold" sx={{ mb: 3 }}>
-                   {t(locale as any, activeItem.id as any)}
-                </Typography>
-                <Stack spacing={3}>
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Stack direction="row" spacing={1}>
-                      {(activeItem as any).tags?.map((tag: string) => (
-                         <Chip 
-                           key={tag} 
-                           label={
-                              tag === 'spicy' ? t(locale as any, 'filter_spicy') :
-                              tag === 'comfort' ? t(locale as any, 'filter_comfort') :
-                              tag === 'quick' ? t(locale as any, 'filter_quick') :
-                              tag === 'crunchy' ? t(locale as any, 'filter_crunchy') :
-                              tag === 'soft' ? t(locale as any, 'filter_soft') :
-                              tag === 'light' ? t(locale as any, 'filter_light') :
-                              tag === 'adventurous' ? t(locale as any, 'filter_adventurous') : tag
-                           } 
-                           size="medium" 
-                           sx={{ borderRadius: 2, fontWeight: 600 }}
-                         />
-                      ))}
-                    </Stack>
-                    <Chip icon={<FavoriteIcon />} label={`${likes.data?.[activeItem.title] ?? 0} likes`} color="primary" variant="outlined" />
-                  </Stack>
-
-                  <Typography variant="h6" sx={{ color: 'text.secondary', lineHeight: 1.8, fontWeight: 400 }}>
-                    {t(locale as any, `${activeItem.id}_desc` as any)}
-                  </Typography>
-                  
-                  <Box sx={{ pt: 2 }}>
-                     <Button 
-                       variant="contained" 
-                       size="large" 
-                       fullWidth 
-                       onClick={() => { likeMut.mutate(`category:${activeItem.title}`); setOpen(false); }}
-                       sx={{ 
-                         py: 1.5, 
-                         fontSize: '1.1rem',
-                         borderRadius: 3,
-                         boxShadow: '0 8px 24px rgba(198, 40, 40, 0.25)'
-                       }}
-                     >
-                       {t(locale as any, 'cta_love')}
-                     </Button>
-                  </Box>
-                </Stack>
-              </DialogContent>
-            </>
-          )}
-        </Dialog>
       </Container>
     </Page>
   )
