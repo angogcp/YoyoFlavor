@@ -31,39 +31,35 @@ function buildSteps(locale: 'en' | 'zh') {
 
 function resultFor(answers: number[]) {
   const score = answers.reduce((a, b) => a + b, 0)
-  if (score >= 6) return { title: 'Hot Pot', image: '/images/HotPot.jpg' }
-  if (score >= 4) return { title: 'Noodles & Rice', image: '/images/Noodles and rice.jpg' }
-  if (score >= 2) return { title: 'Japanese Flavor', image: '/images/japanese flav2.jpg' }
-  return { title: 'Snacks', image: '/images/Snacks.jpg' }
+  if (score >= 6) return { titleKey: 'quiz_result_hotpot', image: '/images/HotPot.jpg' }
+  if (score >= 4) return { titleKey: 'quiz_result_noodles', image: '/images/Noodles and rice.jpg' }
+  if (score >= 2) return { titleKey: 'quiz_result_japanese', image: '/images/japanese flav2.jpg' }
+  return { titleKey: 'quiz_result_snacks', image: '/images/Snacks.jpg' }
 }
 
-function explainMatch(locale: 'en' | 'zh', title: string, answers: number[]) {
+function explainMatch(locale: 'en' | 'zh', titleKey: string, answers: number[]) {
   const s = answers.reduce((a,b)=>a+b,0)
   const parts: string[] = []
-  if (locale === 'zh') {
-    if ((answers[0]||0) >= 3) parts.push('偏好重辣')
-    else if ((answers[0]||0) === 2) parts.push('喜欢适中辣度')
-    else parts.push('更偏向清淡')
-    if ((answers[1]||0) >= 3) parts.push('偏爱口感与酥脆')
-    else if ((answers[1]||0) === 2) parts.push('喜欢软硬适中')
-    else parts.push('偏好柔软嫩滑')
-    if ((answers[2]||0) >= 3) parts.push('今天想尝试更大胆的风味')
-    else if ((answers[2]||0) === 2) parts.push('更想要舒适熟悉的菜品')
-    else parts.push('更想来点清爽轻食')
-    return `根据你的选择（${parts.join('，')}），总分为 ${s}，匹配 ${title}。`
-  } else {
-    if ((answers[0]||0) >= 3) parts.push('you enjoy bold heat')
-    else if ((answers[0]||0) === 2) parts.push('you prefer balanced spice')
-    else parts.push('you like gentle seasoning')
-    if ((answers[1]||0) >= 3) parts.push('you favor texture and crispness')
-    else if ((answers[1]||0) === 2) parts.push('you like a mix of textures')
-    else parts.push('you prefer soft and tender dishes')
-    if ((answers[2]||0) >= 3) parts.push('you feel adventurous today')
-    else if ((answers[2]||0) === 2) parts.push('you want comforting favorites')
-    else parts.push('you want something light')
-    const reason = parts.join(', ') + '.'
-    return `Based on your choices (${reason}) your score is ${s}, matching ${title}.`
-  }
+  
+  if ((answers[0]||0) >= 3) parts.push(t(locale, 'quiz_explain_high_spice'))
+  else if ((answers[0]||0) === 2) parts.push(t(locale, 'quiz_explain_med_spice'))
+  else parts.push(t(locale, 'quiz_explain_low_spice'))
+  
+  if ((answers[1]||0) >= 3) parts.push(t(locale, 'quiz_explain_crunchy'))
+  else if ((answers[1]||0) === 2) parts.push(t(locale, 'quiz_explain_balanced_texture'))
+  else parts.push(t(locale, 'quiz_explain_soft'))
+  
+  if ((answers[2]||0) >= 3) parts.push(t(locale, 'quiz_explain_adventurous'))
+  else if ((answers[2]||0) === 2) parts.push(t(locale, 'quiz_explain_comfort'))
+  else parts.push(t(locale, 'quiz_explain_light'))
+  
+  const joined = parts.join(locale === 'zh' ? '，' : ', ')
+  const title = t(locale, titleKey as any)
+  
+  return t(locale, 'quiz_match_reason')
+    .replace('{0}', joined)
+    .replace('{1}', s.toString())
+    .replace('{2}', title)
 }
 
 export default function Quiz() {
@@ -87,24 +83,27 @@ export default function Quiz() {
     setActive(0)
   }
   function shareWhatsApp() {
-    const text = `I got ${res!.title} on YoYo Flavor Quiz!`
+    const title = res ? t(locale, res.titleKey as any) : ''
+    const text = t(locale, 'quiz_share_msg').replace('{0}', title)
     const url = 'https://wa.me/?text=' + encodeURIComponent(text)
     window.open(url, '_blank')
   }
   if (done && res) {
-    try { localStorage.setItem('quiz:last', res.title) } catch {}
+    try { localStorage.setItem('quiz:last', res.titleKey) } catch {}
   }
   return (
     <Page>
     <Container sx={{ py: 6 }}>
-      <SEO title="YoYo Flavor – Quiz" description="Find your perfect flavor match with our fun quiz." locale={locale as any} />
+      <SEO title={`YoYo Flavor – ${t(locale, 'quiz')}`} description={t(locale, 'quiz_seo_desc')} locale={locale as any} />
       <Typography variant="h4" sx={{ mb: 2 }}>{t(locale, 'quiz')}</Typography>
       <Stepper activeStep={Math.min(active, steps.length)} sx={{ mb: 1 }}>
         {steps.map((s) => (
           <Step key={s}><StepLabel>{s}</StepLabel></Step>
         ))}
       </Stepper>
-      <Typography variant="caption" color="text.secondary" sx={{ mb: 3, display: 'block' }}>{locale === 'zh' ? `第 ${Math.min(active+1, steps.length)} 步，共 ${steps.length} 步` : `Step ${Math.min(active+1, steps.length)} of ${steps.length}`}</Typography>
+      <Typography variant="caption" color="text.secondary" sx={{ mb: 3, display: 'block' }}>
+        {t(locale, 'quiz_step_info').replace('{0}', Math.min(active+1, steps.length).toString()).replace('{1}', steps.length.toString())}
+      </Typography>
       {!done && (
         <Stack spacing={2}>
           <Typography variant="h6">{steps[active]}</Typography>
@@ -118,7 +117,7 @@ export default function Quiz() {
             ))}
           </Stack>
           <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-            <Button variant="text" disabled={active === 0} onClick={back}>{locale === 'zh' ? '返回' : 'Back'}</Button>
+            <Button variant="text" disabled={active === 0} onClick={back}>{t(locale, 'quiz_back')}</Button>
           </Stack>
         </Stack>
       )}
@@ -128,9 +127,9 @@ export default function Quiz() {
           <Card sx={{ maxWidth: 600 }}>
             <CardMedia component="img" height="200" image={res.image} />
             <CardContent>
-              <Typography variant="h5">{res.title}</Typography>
-              <Typography variant="body2">Explore recommended dishes in this category.</Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>{explainMatch(locale, res.title, answers)}</Typography>
+              <Typography variant="h5">{t(locale, res.titleKey as any)}</Typography>
+              <Typography variant="body2">{t(locale, 'quiz_explore')}</Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>{explainMatch(locale, res.titleKey, answers)}</Typography>
             </CardContent>
           </Card>
           <Stack direction="row" spacing={2}>

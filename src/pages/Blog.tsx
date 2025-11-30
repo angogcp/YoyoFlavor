@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Page from '../components/Page'
+import { t } from '../i18n'
 
 function useLocale() {
   const { pathname } = useLocation()
@@ -21,9 +22,9 @@ export default function Blog() {
   return (
     <Page>
     <Container sx={{ py: 6 }}>
-      <SEO title="YoYo Flavor – Blog" description="Stories and updates from the YoYo kitchen." locale={locale as any} />
+      <SEO title="YoYo Flavor – Blog" description={t(locale as any, 'seo_blog_desc')} locale={locale as any} />
       <Stack direction="row" justifyContent="space-between" sx={{ mb: 2 }}>
-        <Typography variant="h4">Blog</Typography>
+        <Typography variant="h4">{t(locale as any, 'blog')}</Typography>
       </Stack>
       <Divider sx={{ mb: 3 }} />
       <Grid container spacing={3}>
@@ -52,7 +53,7 @@ export default function Blog() {
                     <Typography variant="overline">{new Date(p.date).toLocaleDateString()}</Typography>
                     <Typography variant="h6">{p.title}</Typography>
                     <Typography variant="body2">{p.excerpt}</Typography>
-                    <Button variant="outlined" onClick={() => nav(`/${locale}/blog/${p.slug}`)}>Read</Button>
+                    <Button variant="outlined" onClick={() => nav(`/${locale}/blog/${p.slug}`)}>{t(locale as any, 'blog_read')}</Button>
                   </Stack>
                 </CardContent>
               </Card>

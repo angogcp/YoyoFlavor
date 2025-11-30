@@ -61,13 +61,13 @@ export default function Home() {
   const mapsHref = mapsLink()
 
   const schedule = [
-    { d: 'Mon', open: '11:00', close: '22:00' },
-    { d: 'Tue', open: '11:00', close: '22:00' },
-    { d: 'Wed', open: '11:00', close: '22:00' },
-    { d: 'Thu', open: '11:00', close: '22:00' },
-    { d: 'Fri', open: '11:00', close: '22:00' },
-    { d: 'Sat', open: '10:00', close: '23:00' },
-    { d: 'Sun', open: '10:00', close: '23:00' }
+    { d: 'day_mon', open: '11:00', close: '22:00' },
+    { d: 'day_tue', open: '11:00', close: '22:00' },
+    { d: 'day_wed', open: '11:00', close: '22:00' },
+    { d: 'day_thu', open: '11:00', close: '22:00' },
+    { d: 'day_fri', open: '11:00', close: '22:00' },
+    { d: 'day_sat', open: '10:00', close: '23:00' },
+    { d: 'day_sun', open: '10:00', close: '23:00' }
   ]
 
   const now = new Date()
@@ -139,17 +139,17 @@ export default function Home() {
       <Container sx={{ py: 8 }}>
         <Grid container spacing={4}>
           {[
-            { icon: <LocalDiningIcon fontSize="large" />, title: 'Fresh Ingredients', desc: 'We source the finest local ingredients daily.' },
-            { icon: <RestaurantIcon fontSize="large" />, title: 'Authentic Taste', desc: 'Recipes crafted with tradition and passion.' },
-            { icon: <EmojiFoodBeverageIcon fontSize="large" />, title: 'Cozy Atmosphere', desc: 'A perfect place to relax with friends and family.' }
+            { icon: <LocalDiningIcon fontSize="large" />, title: 'feat_fresh_title', desc: 'feat_fresh_desc' },
+            { icon: <RestaurantIcon fontSize="large" />, title: 'feat_auth_title', desc: 'feat_auth_desc' },
+            { icon: <EmojiFoodBeverageIcon fontSize="large" />, title: 'feat_cozy_title', desc: 'feat_cozy_desc' }
           ].map((f, i) => (
             <Grid item xs={12} md={4} key={i}>
               <Stack alignItems="center" spacing={2} sx={{ textAlign: 'center' }} component={motion.div} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
                 <Box sx={{ p: 2, borderRadius: '50%', bgcolor: 'primary.light', color: 'primary.main', display: 'inline-flex' }}>
                   {f.icon}
                 </Box>
-                <Typography variant="h6" fontWeight="bold">{f.title}</Typography>
-                <Typography variant="body1" color="text.secondary">{f.desc}</Typography>
+                <Typography variant="h6" fontWeight="bold">{t(locale as any, f.title as any)}</Typography>
+                <Typography variant="body1" color="text.secondary">{t(locale as any, f.desc as any)}</Typography>
               </Stack>
             </Grid>
           ))}
@@ -195,8 +195,8 @@ export default function Home() {
       <Box sx={{ bgcolor: 'action.hover', py: 10 }}>
         <Container>
           <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
-            <Typography variant="h4" fontWeight="bold">Popular Flavors</Typography>
-            <Button endIcon={<ArrowForwardIcon />} onClick={() => nav(`/${locale}/menu`)}>View Full Menu</Button>
+            <Typography variant="h4" fontWeight="bold">{t(locale as any, 'popular_flavors')}</Typography>
+            <Button endIcon={<ArrowForwardIcon />} onClick={() => nav(`/${locale}/menu`)}>{t(locale as any, 'view_full_menu')}</Button>
           </Stack>
           <Grid container spacing={3}>
             {featuredCategories.map((c, i) => (
@@ -225,7 +225,7 @@ export default function Home() {
 
       {/* Reviews */}
       <Container sx={{ py: 10 }}>
-        <Typography variant="h4" fontWeight="bold" sx={{ mb: 4, textAlign: 'center' }}>What Our Guests Say</Typography>
+        <Typography variant="h4" fontWeight="bold" sx={{ mb: 4, textAlign: 'center' }}>{t(locale as any, 'home_reviews_title')}</Typography>
         <Masonry columns={{ xs: 1, sm: 2, md: 3 }} spacing={3}>
           {(topReviews || []).slice(0, 6).map((r, i) => (
             <motion.div key={r.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}>
@@ -253,7 +253,7 @@ export default function Home() {
           ))}
         </Masonry>
         <Box sx={{ textAlign: 'center', mt: 4 }}>
-          <Button variant="outlined" size="large" onClick={() => nav(`/${locale}/reviews`)}>Read More Reviews</Button>
+          <Button variant="outlined" size="large" onClick={() => nav(`/${locale}/reviews`)}>{t(locale as any, 'home_read_more_reviews')}</Button>
         </Box>
       </Container>
 
@@ -265,14 +265,14 @@ export default function Home() {
               <Typography variant="h4" fontWeight="bold" sx={{ mb: 3, color: 'primary.main' }}>{t(locale as any, 'hours')}</Typography>
               <Stack spacing={2}>
                 <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
-                  <Chip label={isOpen ? 'Open Now' : 'Closed'} color={isOpen ? 'success' : 'error'} />
-                  <Typography variant="body2" color="gray">Current time: {now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Typography>
+                  <Chip label={isOpen ? t(locale as any, 'status_open') : t(locale as any, 'status_closed')} color={isOpen ? 'success' : 'error'} />
+                  <Typography variant="body2" color="gray">{t(locale as any, 'current_time')}: {now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Typography>
                 </Stack>
                 <Grid container spacing={2}>
                   {schedule.map((s, i) => (
                     <Grid item xs={6} sm={4} key={s.d}>
                       <Box sx={{ p: 2, borderRadius: 2, bgcolor: i === todayIdx ? 'rgba(255,255,255,0.1)' : 'transparent', border: '1px solid', borderColor: i === todayIdx ? 'primary.main' : 'rgba(255,255,255,0.1)' }}>
-                        <Typography variant="subtitle2" fontWeight="bold" color={i === todayIdx ? 'primary.main' : 'white'}>{s.d}</Typography>
+                        <Typography variant="subtitle2" fontWeight="bold" color={i === todayIdx ? 'primary.main' : 'white'}>{t(locale as any, s.d as any)}</Typography>
                         <Typography variant="caption" color="gray">{s.open} - {s.close}</Typography>
                       </Box>
                     </Grid>
@@ -286,22 +286,22 @@ export default function Home() {
                 <Stack spacing={3}>
                   <Box>
                     <Typography variant="subtitle1" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <PlaceIcon color="primary" /> Address
+                      <PlaceIcon color="primary" /> {t(locale as any, 'label_address')}
                     </Typography>
                     <Typography variant="body2" color="gray" sx={{ ml: 4, mt: 0.5 }}>{address}</Typography>
                   </Box>
                   <Box>
                     <Typography variant="subtitle1" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <PhoneIcon color="primary" /> Phone
+                      <PhoneIcon color="primary" /> {t(locale as any, 'label_phone')}
                     </Typography>
                     <Typography variant="body2" color="gray" sx={{ ml: 4, mt: 0.5 }}>{phone}</Typography>
                   </Box>
                   <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-                    <Button variant="contained" startIcon={<PhoneIcon />} href={`tel:${phone}`} fullWidth>Call</Button>
+                    <Button variant="contained" startIcon={<PhoneIcon />} href={`tel:${phone}`} fullWidth>{t(locale as any, 'contact_call')}</Button>
                     <Button variant="contained" color="success" startIcon={<WhatsAppIcon />} href={waLink} target="_blank" fullWidth>WhatsApp</Button>
                   </Stack>
                   <Button variant="outlined" startIcon={<PlaceIcon />} href={mapsHref} target="_blank" fullWidth sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.3)' }}>
-                    Get Directions
+                    {t(locale as any, 'get_directions')}
                   </Button>
                 </Stack>
               </Paper>

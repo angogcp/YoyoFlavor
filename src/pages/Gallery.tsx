@@ -66,7 +66,7 @@ export default function Gallery() {
     <Page>
       <SEO 
         title="YoYo Flavor – Gallery" 
-        description="Explore the vibrant atmosphere and delicious dishes at YoYo Flavor." 
+        description={t(locale, 'gallery_seo_desc')} 
         locale={locale as any} 
       />
       {/* Hero Section */}

@@ -6,6 +6,7 @@ import Page from '../components/Page'
 import SEO from '../components/SEO'
 import { useState } from 'react'
 import type { Review as ReviewType } from '../lib/api'
+import { t } from '../i18n'
 
 export default function Reviews() {
   const qc = useQueryClient()
@@ -49,10 +50,10 @@ export default function Reviews() {
   return (
     <Page>
     <Container sx={{ py: 6 }}>
-      <SEO title="YoYo Flavor – Reviews" description="Read what our customers say about us." locale={locale as any} />
-      <Typography variant="h4" sx={{ mb: 1 }}>Reviews</Typography>
+      <SEO title={`YoYo Flavor – ${t(locale as any, 'reviews_title')}`} description={t(locale as any, 'reviews_seo_desc')} locale={locale as any} />
+      <Typography variant="h4" sx={{ mb: 1 }}>{t(locale as any, 'reviews_title')}</Typography>
       <Divider sx={{ mb: 2 }} />
-      <Typography variant="body2" sx={{ mb: 1 }}>{items.length} of {total} shown</Typography>
+      <Typography variant="body2" sx={{ mb: 1 }}>{t(locale as any, 'reviews_shown').replace('{0}', items.length.toString()).replace('{1}', total.toString())}</Typography>
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {!items.length && [1,2,3].map(i => (
           <Grid item xs={12} md={4} key={`sk-${i}`}>
@@ -73,22 +74,22 @@ export default function Reviews() {
         ))}
       </Grid>
       {hasNextPage && (
-        <Button variant="outlined" onClick={() => fetchNextPage()} disabled={isFetchingNextPage} sx={{ mb: 4 }}>Load more</Button>
+        <Button variant="outlined" onClick={() => fetchNextPage()} disabled={isFetchingNextPage} sx={{ mb: 4 }}>{t(locale as any, 'reviews_load_more')}</Button>
       )}
       <Divider sx={{ mb: 2 }} />
-      <Typography variant="h6" sx={{ mb: 2 }}>Add your review</Typography>
+      <Typography variant="h6" sx={{ mb: 2 }}>{t(locale as any, 'reviews_add')}</Typography>
       <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
-        <TextField label="Name" value={name} onChange={e => setName(e.target.value)} />
-        <TextField label="Comment" value={comment} onChange={e => setComment(e.target.value)} fullWidth />
-        <TextField label="Image URL (optional)" value={image} onChange={e => setImage(e.target.value)} />
+        <TextField label={t(locale as any, 'reviews_name')} value={name} onChange={e => setName(e.target.value)} />
+        <TextField label={t(locale as any, 'reviews_comment')} value={comment} onChange={e => setComment(e.target.value)} fullWidth />
+        <TextField label={t(locale as any, 'reviews_image_url')} value={image} onChange={e => setImage(e.target.value)} />
       </Stack>
       <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
         <input id="file-input" type="file" accept="image/*" style={{ display: 'none' }} onChange={e => setFile(e.target.files?.[0] || null)} />
-        <Button variant="text" onClick={() => (document.getElementById('file-input') as HTMLInputElement).click()}>Upload image</Button>
-        <Typography variant="body2">{file ? file.name : 'No file selected'}</Typography>
+        <Button variant="text" onClick={() => (document.getElementById('file-input') as HTMLInputElement).click()}>{t(locale as any, 'reviews_upload_image')}</Button>
+        <Typography variant="body2">{file ? file.name : t(locale as any, 'reviews_no_file')}</Typography>
       </Stack>
       <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-        <Typography>Rating</Typography>
+        <Typography>{t(locale as any, 'reviews_rating')}</Typography>
         <Rating value={rating} onChange={(_, v) => setRating(v)} />
         <Button variant="contained" disabled={!isValid || add.isLoading} onClick={async () => {
           let img = image.trim() || undefined
@@ -96,10 +97,10 @@ export default function Reviews() {
             try { img = await api.uploadImage(file) } catch {}
           }
           add.mutate({ name: name.trim(), comment: comment.trim(), rating: rating || 0, image: img })
-        }}>Submit</Button>
+        }}>{t(locale as any, 'reviews_submit')}</Button>
       </Stack>
-      {status === 'success' && <Alert severity="success">Thank you! Your review was submitted.</Alert>}
-      {status === 'error' && <Alert severity="error">Submission failed. Please try again.</Alert>}
+      {status === 'success' && <Alert severity="success">{t(locale as any, 'reviews_success')}</Alert>}
+      {status === 'error' && <Alert severity="error">{t(locale as any, 'reviews_error')}</Alert>}
     </Container>
     </Page>
   )
@@ -107,6 +108,7 @@ export default function Reviews() {
 
 function ReviewCard({ r }: { r: ReviewType }) {
   const qc = useQueryClient()
+  const locale = window.location.pathname.split('/')[1] === 'zh' ? 'zh' : 'en'
   const likeKey = `review:${r.id}`
   const likes = useQuery({ queryKey: ['review-like', r.id], queryFn: () => api.getLikes(likeKey) })
   const likeMut = useMutation({ mutationFn: () => api.like(likeKey), onSuccess: () => qc.invalidateQueries({ queryKey: ['review-like', r.id] }) })
@@ -125,8 +127,8 @@ function ReviewCard({ r }: { r: ReviewType }) {
             <Rating value={r.rating} readOnly />
             <Typography variant="body2">{r.comment}</Typography>
             <Stack direction="row" spacing={2} sx={{ mt: 1 }} alignItems="center">
-              <Button variant="contained" onClick={() => likeMut.mutate()} disabled={likeMut.isLoading}>Like</Button>
-              <Typography variant="body2">{likes.data ?? 0} likes</Typography>
+              <Button variant="contained" onClick={() => likeMut.mutate()} disabled={likeMut.isLoading}>{t(locale as any, 'reviews_like')}</Button>
+              <Typography variant="body2">{t(locale as any, 'reviews_likes_count').replace('{0}', (likes.data ?? 0).toString())}</Typography>
             </Stack>
           </Stack>
         </CardContent>

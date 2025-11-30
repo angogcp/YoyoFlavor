@@ -2,11 +2,20 @@ import { Box, Container, Grid, Paper, Stack, Typography, Button, TextField, Aler
 import { useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState as useReactState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { api } from '../lib/api'
 import Page from '../components/Page'
 import SEO from '../components/SEO'
+import { t } from '../i18n'
+
+function useLocale() {
+  const { pathname } = useLocation()
+  const seg = pathname.split('/')[1]
+  return seg === 'zh' ? 'zh' : 'en'
+}
 
 export default function Contact() {
+  const locale = useLocale()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
@@ -44,8 +53,8 @@ export default function Contact() {
   return (
     <Page>
     <Container sx={{ py: 6 }}>
-      <SEO title="YoYo Flavor – Contact" description="Get in touch with us. Visit, call, or message." locale="en" />
-      <Typography variant="h4" sx={{ mb: 1 }}>Contact</Typography>
+      <SEO title={`YoYo Flavor – ${t(locale, 'contact')}`} description={t(locale, 'seo_contact_desc')} locale={locale} />
+      <Typography variant="h4" sx={{ mb: 1 }}>{t(locale, 'contact')}</Typography>
       <Divider sx={{ mb: 3 }} />
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
@@ -53,10 +62,10 @@ export default function Contact() {
             <Stack spacing={2}>
               <Box component="img" src="/images/yoyo intro.png" alt="Intro" sx={{ width: '100%', borderRadius: 2 }} />
               <Stack direction="row" spacing={2}>
-                <Button variant="contained" href={`tel:${phone}`}>Call</Button>
-                <Button variant="outlined" href={waLink} target="_blank">WhatsApp</Button>
-                <Button variant="outlined" href="https://www.facebook.com/yoyoflavor/" target="_blank">Facebook</Button>
-                <Button variant="text" href={mapsHref} target="_blank">Find us</Button>
+                <Button variant="contained" href={`tel:${phone}`}>{t(locale, 'contact_call')}</Button>
+                <Button variant="outlined" href={waLink} target="_blank">{t(locale, 'contact_whatsapp')}</Button>
+                <Button variant="outlined" href="https://www.facebook.com/yoyoflavor/" target="_blank">{t(locale, 'footer_facebook')}</Button>
+                <Button variant="text" href={mapsHref} target="_blank">{t(locale, 'contact_find_us')}</Button>
               </Stack>
             </Stack>
           </Paper>
@@ -64,31 +73,31 @@ export default function Contact() {
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Stack spacing={2}>
-              <Typography variant="h6">Send us a message</Typography>
-              <TextField fullWidth label="Name" value={name} onChange={e => setName(e.target.value)} />
-              <TextField fullWidth label="Email" value={email} onChange={e => setEmail(e.target.value)} error={!!email && !email.includes('@')} helperText={email && !email.includes('@') ? 'Enter a valid email' : ''} />
-              <TextField fullWidth label="Message" value={message} onChange={e => setMessage(e.target.value)} multiline minRows={4} error={message.trim().length > 0 && message.trim().length < 3} helperText={message && message.trim().length < 3 ? 'Message must be at least 3 characters' : ''} />
-              <Button variant="contained" disabled={!valid || submit.isLoading} onClick={() => submit.mutate()}>Submit</Button>
+              <Typography variant="h6">{t(locale, 'contact_intro')}</Typography>
+              <TextField fullWidth label={t(locale, 'contact_name')} value={name} onChange={e => setName(e.target.value)} />
+              <TextField fullWidth label={t(locale, 'contact_email')} value={email} onChange={e => setEmail(e.target.value)} error={!!email && !email.includes('@')} helperText={email && !email.includes('@') ? t(locale, 'contact_valid_email') : ''} />
+              <TextField fullWidth label={t(locale, 'contact_msg')} value={message} onChange={e => setMessage(e.target.value)} multiline minRows={4} error={message.trim().length > 0 && message.trim().length < 3} helperText={message && message.trim().length < 3 ? t(locale, 'contact_valid_msg') : ''} />
+              <Button variant="contained" disabled={!valid || submit.isLoading} onClick={() => submit.mutate()}>{t(locale, 'contact_submit')}</Button>
               {status === 'success' && (
                 <Alert severity="success">
-                  Thanks! Your reference ID: {refId}
+                  {t(locale, 'contact_success')} {refId}
                 </Alert>
               )}
-              {status === 'error' && <Alert severity="error">Submission failed. Try again.</Alert>}
+              {status === 'error' && <Alert severity="error">{t(locale, 'contact_error')}</Alert>}
               <Divider sx={{ my: 2 }} />
-              <Typography variant="h6">Check message status</Typography>
+              <Typography variant="h6">{t(locale, 'contact_check_title')}</Typography>
               <Stack direction="row" spacing={2}>
-                <TextField fullWidth label="Reference ID" value={checkId} onChange={e => setCheckId(e.target.value)} />
+                <TextField fullWidth label={t(locale, 'contact_ref_id')} value={checkId} onChange={e => setCheckId(e.target.value)} />
                 <Button variant="outlined" onClick={async () => {
                   const item = await api.getContactById(checkId.trim())
                   setCheckResult(item ? { status: item.status, reply: item.reply, date: item.repliedAt } : null)
-                }}>Check</Button>
+                }}>{t(locale, 'contact_check')}</Button>
               </Stack>
               {checkResult && (
                 <Stack>
-                  <Typography>Status: {checkResult.status}</Typography>
-                  {checkResult.reply && <Typography>Reply: {checkResult.reply}</Typography>}
-                  {checkResult.date && <Typography>Replied At: {new Date(checkResult.date).toLocaleString()}</Typography>}
+                  <Typography>{t(locale, 'contact_status')}: {checkResult.status}</Typography>
+                  {checkResult.reply && <Typography>{t(locale, 'contact_reply')}: {checkResult.reply}</Typography>}
+                  {checkResult.date && <Typography>{t(locale, 'contact_replied_at')}: {new Date(checkResult.date).toLocaleString()}</Typography>}
                 </Stack>
               )}
             </Stack>

@@ -227,7 +227,7 @@ export default function Menu() {
                 </FormControl>
                 <FormControlLabel
                   control={<Switch checked={useGhibli} onChange={e => setUseGhibli(e.target.checked)} />}
-                  label={<Typography variant="body2" fontWeight="bold">Ghibli Style</Typography>}
+                  label={<Typography variant="body2" fontWeight="bold">{t(locale as any, 'menu_ghibli')}</Typography>}
                 />
               </Stack>
             </Grid>
@@ -241,7 +241,7 @@ export default function Menu() {
             <Grid item xs={12} md={3}>
               <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 3, overflow: 'hidden' }}>
                 <Box sx={{ p: 2, bgcolor: 'primary.main', color: 'white' }}>
-                  <Typography variant="h6" fontWeight="bold">Menu Sections</Typography>
+                  <Typography variant="h6" fontWeight="bold">{t(locale as any, 'menu_sections')}</Typography>
                 </Box>
                 <Box sx={{ flex: 1, overflowY: 'auto', p: 1 }}>
                   <Stack spacing={1}>
@@ -294,7 +294,7 @@ export default function Menu() {
                      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', bgcolor: 'white', borderBottom: '1px solid', borderColor: 'divider' }}>
                         <Typography variant="h5" fontWeight="bold">{t(locale as any, activeCategory.id as any)}</Typography>
                         <Stack direction="row" spacing={1} alignItems="center">
-                           <Tooltip title="Like this category">
+                           <Tooltip title={t(locale as any, 'menu_like_category')}>
                               <IconButton onClick={() => likeMut.mutate(`category:${activeCategory.title}`)} color="secondary">
                                 {(likes.data?.[activeCategory.title] ?? 0) > 0 ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                               </IconButton>
@@ -326,17 +326,17 @@ export default function Menu() {
                           onClick={handlePrev}
                           startIcon={<span>←</span>}
                         >
-                          Previous
+                          {t(locale as any, 'menu_prev')}
                         </Button>
                         <Typography variant="body2" color="text.secondary">
-                          Page {selectedIndex + 1} of {list.length}
+                          {t(locale as any, 'menu_page_info').replace('{0}', (selectedIndex + 1).toString()).replace('{1}', list.length.toString())}
                         </Typography>
                         <Button 
                           disabled={selectedIndex === list.length - 1} 
                           onClick={handleNext}
                           endIcon={<span>→</span>}
                         >
-                          Next
+                          {t(locale as any, 'menu_next')}
                         </Button>
                      </Box>
                   </motion.div>
@@ -346,8 +346,8 @@ export default function Menu() {
           </Grid>
         ) : (
           <Box sx={{ textAlign: 'center', py: 8 }}>
-            <Typography variant="h6" color="text.secondary">No menu items found matching your criteria.</Typography>
-            <Button variant="outlined" sx={{ mt: 2 }} onClick={() => { setQ(''); setSelected([]); }}>Clear Filters</Button>
+            <Typography variant="h6" color="text.secondary">{t(locale as any, 'menu_no_items')}</Typography>
+            <Button variant="outlined" sx={{ mt: 2 }} onClick={() => { setQ(''); setSelected([]); }}>{t(locale as any, 'menu_clear_filters')}</Button>
           </Box>
         )}
 
