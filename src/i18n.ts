@@ -228,7 +228,17 @@ const en: Dict = {
   admin_cancel: 'Cancel',
   admin_send: 'Send',
   admin_replied_label: 'Replied: ',
-  contact_whatsapp: 'WhatsApp'
+  admin_tab_qr: 'QR Codes',
+  admin_qr_title: 'Table QR Codes',
+  admin_qr_list: 'Table List (comma separated, e.g. 1, 2, T-Open1, T-Open2)',
+  admin_qr_generate: 'Generate',
+  admin_qr_print: 'Print',
+  scan_to_order: 'SCAN TO ORDER',
+  select_table: 'Select Your Table',
+  select_table_desc: 'Please select your table number to view the menu.',
+  contact_whatsapp: 'WhatsApp',
+  order_now: 'Order Now',
+  order_title: 'Order Online'
 }
 
 const zh: Dict = {
@@ -459,7 +469,17 @@ const zh: Dict = {
   admin_cancel: '取消',
   admin_send: '发送',
   admin_replied_label: '已回复：',
-  contact_whatsapp: 'WhatsApp'
+  admin_tab_qr: '二维码',
+  admin_qr_title: '餐桌二维码',
+  admin_qr_list: '桌号列表（用逗号分隔，例如 1, 2, T-Open1, T-Open2）',
+  admin_qr_generate: '生成',
+  admin_qr_print: '打印',
+  scan_to_order: '扫码点餐',
+  select_table: '选择您的桌号',
+  select_table_desc: '请选择您的桌号以查看菜单。',
+  contact_whatsapp: 'WhatsApp',
+  order_now: '立即点餐',
+  order_title: '在线点餐'
 }
 
 export function t(locale: 'en' | 'zh', key: keyof typeof en) {

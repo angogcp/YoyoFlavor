@@ -1,9 +1,10 @@
 import { Container, Stack, TextField, Button, Typography, Card, CardContent, CardMedia, Grid, Dialog, DialogTitle, DialogContent, Tabs, Tab, Box, Badge, Skeleton } from '@mui/material'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQueryClient, useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useLocation } from 'react-router-dom'
 import { t } from '../i18n'
+import QRCode from 'react-qr-code'
 
 function useLocale() {
   const { pathname } = useLocation()
@@ -107,14 +108,47 @@ function AdminContent({ locale }: { locale: 'en' | 'zh' }) {
   const [logoFile, setLogoFile] = useState<File | null>(null)
   const [bannerFile, setBannerFile] = useState<File | null>(null)
   const [postsQ, setPostsQ] = useState('')
-  async function saveSettings() {
+  const [tableListStr, setTableListStr] = useState('')
+  const [qrCodes, setQrCodes] = useState<{ id: string; url: string }[]>([])
+
+  useEffect(() => {
+    if (settings) {
+      setLogoUrl(settings.logoUrl)
+      setBannerUrl(settings.bannerUrl)
+      setAddress(settings.address || '')
+      setMapsUrl(settings.mapsUrl || '')
+      setLatText(settings.lat ? String(settings.lat) : '')
+      setLngText(settings.lng ? String(settings.lng) : '')
+      
+      if (settings.tableList && settings.tableList.length > 0) {
+        setTableListStr(settings.tableList.join(', '))
+      } else {
+        const s = settings.tableStart || 1
+        const e = settings.tableEnd || 20
+        const arr = []
+        for(let i=s; i<=e; i++) arr.push(String(i))
+        setTableListStr(arr.join(', '))
+      }
+    }
+  }, [settings])
+
+  function generateQRCodes() {
+    const list = tableListStr.split(',').map(s => s.trim()).filter(s => s)
+    const codes = list.map(id => ({ id, url: `${window.location.origin}/order?table=${id}` }))
+    setQrCodes(codes)
+    saveSettings(list)
+  }
+
+  async function saveSettings(list?: string[]) {
     let logo = logoUrl
     let banner = bannerUrl
     if (logoFile) logo = await api.uploadImage(logoFile)
     if (bannerFile) banner = await api.uploadImage(bannerFile)
     const lat = latText.trim() ? parseFloat(latText.trim()) : undefined
     const lng = lngText.trim() ? parseFloat(lngText.trim()) : undefined
-    await api.updateSettings({ logoUrl: logo, bannerUrl: banner, address, mapsUrl, lat, lng })
+    const tList = list && Array.isArray(list) ? list : tableListStr.split(',').map(s => s.trim()).filter(s => s)
+    
+    await api.updateSettings({ logoUrl: logo, bannerUrl: banner, address, mapsUrl, lat, lng, tableList: tList })
     qc.invalidateQueries({ queryKey: ['settings'] })
   }
   const { data: reviews, fetchNextPage: fetchMoreReviews, hasNextPage: hasMoreReviews, isLoading: reviewsLoading } = useInfiniteQuery({
@@ -145,6 +179,7 @@ function AdminContent({ locale }: { locale: 'en' | 'zh' }) {
         <Tab label={<Badge color="primary" badgeContent={(contacts?.pages || []).reduce((acc,p)=>acc+p.items.filter(c=> (c.status||'new')==='new').length,0)} invisible={!((contacts?.pages || []).reduce((acc,p)=>acc+p.items.filter(c=> (c.status||'new')==='new').length,0))}>{t(locale, 'admin_tab_contacts')}</Badge>} />
         <Tab label={<Badge color="primary" badgeContent={(postsList || []).length} invisible={!((postsList || []).length)}>{t(locale, 'admin_tab_posts')}</Badge>} />
         <Tab label={<Badge color="primary" badgeContent={(reviews?.pages || []).reduce((acc,p)=>acc+p.items.length,0)} invisible={!((reviews?.pages || []).reduce((acc,p)=>acc+p.items.length,0))}>{t(locale, 'admin_tab_reviews')}</Badge>} />
+        <Tab label={t(locale, 'admin_tab_qr')} />
       </Tabs>
       <Box sx={{ display: tab === 0 ? 'block' : 'none' }}>
         <Typography variant="h6" sx={{ mb: 2 }}>{t(locale, 'admin_brand_settings')}</Typography>
@@ -275,6 +310,60 @@ function AdminContent({ locale }: { locale: 'en' | 'zh' }) {
           ))}
         </Stack>
         {hasMoreReviews && <Button onClick={() => fetchMoreReviews()} sx={{ mt: 2 }}>{t(locale, 'admin_load_more')}</Button>}
+      </Box>
+      <Box sx={{ display: tab === 5 ? 'block' : 'none' }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>{t(locale, 'admin_qr_title')}</Typography>
+        <Stack spacing={3} sx={{ mb: 4 }}>
+          <TextField 
+            label={t(locale, 'admin_qr_list')}
+            multiline
+            rows={3}
+            value={tableListStr} 
+            onChange={e => setTableListStr(e.target.value)} 
+            fullWidth
+          />
+          <Stack direction="row" spacing={2}>
+            <Button variant="contained" onClick={generateQRCodes}>{t(locale, 'admin_qr_generate')}</Button>
+            <Button variant="outlined" onClick={() => window.print()}>{t(locale, 'admin_qr_print')}</Button>
+          </Stack>
+        </Stack>
+        <Grid container spacing={2} id="qr-print-area" sx={{
+          '@media print': {
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            bgcolor: 'background.paper',
+            zIndex: 9999,
+            p: 4,
+            m: 0,
+            overflow: 'auto'
+          }
+        }}>
+          {qrCodes.map(q => (
+            <Grid item xs={6} md={4} lg={3} key={q.id}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between',
+                border: '2px solid #000', 
+                borderRadius: 2, 
+                p: 2, 
+                pageBreakInside: 'avoid',
+                bgcolor: 'white'
+              }}>
+                 <Box sx={{ mr: 2 }}>
+                   <QRCode value={q.url} size={80} />
+                 </Box>
+                 <Box sx={{ flexGrow: 1, textAlign: 'center' }}>
+                    <Typography variant="h5" sx={{ fontWeight: 900, fontSize: '1.5rem' }}>{q.id}</Typography>
+                    <Typography variant="caption" sx={{ display: 'block', fontSize: '0.7rem', mt: 0.5 }}>{t(locale, 'scan_to_order')}</Typography>
+                  </Box>
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
       </Box>
 
       <Dialog open={replyOpen} onClose={() => setReplyOpen(false)}>

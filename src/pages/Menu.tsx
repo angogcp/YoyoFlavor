@@ -18,6 +18,8 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu'
 import CloseIcon from '@mui/icons-material/Close'
+import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket'
+import { useNavigate } from 'react-router-dom'
 
 function useLocale() {
   const { pathname } = useLocation()
@@ -58,6 +60,7 @@ export default function Menu() {
   const qc = useQueryClient()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const nav = useNavigate()
 
   const likes = useQuery({
     queryKey: ['likes'],
@@ -352,6 +355,15 @@ export default function Menu() {
         )}
 
       </Container>
+      
+      <Fab 
+        color="primary" 
+        aria-label="order" 
+        sx={{ position: 'fixed', bottom: 32, right: 32, zIndex: 100 }}
+        onClick={() => nav(`/${locale}/order`)}
+      >
+        <ShoppingBasketIcon />
+      </Fab>
     </Page>
   )
 }

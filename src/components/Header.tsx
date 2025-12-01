@@ -38,6 +38,7 @@ export default function Header() {
   const navItems = [
     { key: 'home', to: `/${locale}` },
     { key: 'menu', to: `/${locale}/menu` },
+    { key: 'order_now', to: `/${locale}/order`, highlight: true },
     { key: 'gallery', to: `/${locale}/gallery` },
     { key: 'reviews', to: `/${locale}/reviews` },
     { key: 'blog', to: `/${locale}/blog` },

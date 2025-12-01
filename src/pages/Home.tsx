@@ -116,6 +116,15 @@ export default function Home() {
               <Button 
                 variant="contained" 
                 size="large" 
+                color="secondary"
+                onClick={() => nav(`/${locale}/order`)}
+                sx={{ py: 1.5, px: 4, fontSize: '1.1rem', borderRadius: 50, fontWeight: 'bold' }}
+              >
+                {t(locale as any, 'order_now')}
+              </Button>
+              <Button 
+                variant="contained" 
+                size="large" 
                 onClick={() => nav(`/${locale}/menu`)}
                 sx={{ py: 1.5, px: 4, fontSize: '1.1rem', borderRadius: 50 }}
               >
